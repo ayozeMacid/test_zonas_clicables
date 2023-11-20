@@ -1,12 +1,12 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Coords } from "../types/Coords";
-import { Square } from "../types/Square";
+import { Square, Zone } from "../types/Zone";
 export const useCanvas = () => {
   const canvasElement = useRef<HTMLCanvasElement>(null);
-  let canvas: CanvasRenderingContext2D;
-  let canvasDescription: DOMRect;
+  const [canvas, setCanvas] = useState<CanvasRenderingContext2D>();
+  const [canvasDescription, setCanvasDescription] = useState<DOMRect>();
 
-  const zoneCollection: Array<Square> = [];
+  const [zoneCollection, setZoneCollection] = useState<Zone[]>([]);
 
   const clearCanvas = () => {
     canvas.clearRect(0, 0, canvasDescription.width, canvasDescription.height);
@@ -18,29 +18,47 @@ export const useCanvas = () => {
     canvas.strokeRect(originPoint.x, originPoint.y, width, height);
   };
 
-  const render = (temporal: Square) => {
+  const render = (temporal?: Square) => {
     clearCanvas();
 
     zoneCollection.forEach((zone) => {
       drawSquare(zone.origin, zone.destination);
     });
 
-    drawSquare(temporal.origin, temporal.destination);
+    if (temporal) {
+      drawSquare(temporal.origin, temporal.destination);
+    }
   };
 
-  const addNewZone = (zone: Square) => {
-    zoneCollection.push(zone);
+  const addNewZone = (zone: Zone) => {
+    setZoneCollection([...zoneCollection, zone]);
+  };
+
+  const getCanvasCoords = (pointerCoords: Coords): Coords => {
+    return {
+      x: pointerCoords.x - canvasDescription.x,
+      y: pointerCoords.y - canvasDescription.y,
+    };
   };
 
   useEffect(() => {
-    canvas = canvasElement.current.getContext("2d");
-    canvasDescription = canvasElement.current.getBoundingClientRect();
+    const canvas = canvasElement.current.getContext("2d");
     canvas.setLineDash([2, 4]);
+    setCanvas(canvas);
+    setCanvasDescription(canvasElement.current.getBoundingClientRect());
   }, [canvasElement]);
+
+  useEffect(() => {
+    if (canvas) {
+      render();
+    }
+  }, [zoneCollection]);
 
   return {
     reference: canvasElement,
     addNewZone,
     render,
+    getCanvasCoords,
+    zoneCollection: zoneCollection,
   };
 };
