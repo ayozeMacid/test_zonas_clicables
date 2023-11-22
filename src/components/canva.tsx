@@ -29,11 +29,7 @@ export const Canvas = () => {
     const y = event.clientY;
     const cursorCoords: Coords = getCanvasCoords({ x, y });
 
-    if (isMovement(cursorCoords)) {
-      setIsPointerCursor(true);
-    } else {
-      setIsPointerCursor(false);
-    }
+    setIsPointerCursor(!!isMovement(cursorCoords));
   };
 
   const handleMouseMove = (event: React.MouseEvent) => {
@@ -42,8 +38,8 @@ export const Canvas = () => {
 
     changeCursor(event);
 
+    const destinationCoords: Coords = getCanvasCoords({ x, y });
     if (selectedZone) {
-      const destinationCoords: Coords = getCanvasCoords({ x, y });
       const diff = CoordsMethods.substractCoords(
         selectedZone.origin,
         destinationCoords
@@ -52,7 +48,6 @@ export const Canvas = () => {
     }
 
     if (originCoords) {
-      const destinationCoords: Coords = getCanvasCoords({ x, y });
       render({ origin: originCoords, destination: destinationCoords });
     }
   };
