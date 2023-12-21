@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Coords, CoordsMethods } from "../types/Coords";
 import { Square, Zone } from "../types/Zone";
 export const useCanvas = (backgroundUrl?: string) => {
@@ -40,9 +40,9 @@ export const useCanvas = (backgroundUrl?: string) => {
 
   const moveZone = (zoneId: Zone["id"], coords: Coords) => {
     setZoneCollection((zoneCollection) => {
-      const x = zoneCollection.find((zone) => zone.id === zoneId);
-      x.origin = CoordsMethods.sumCoords(x.origin, coords);
-      x.destination = CoordsMethods.sumCoords(x.destination, coords);
+      const zone = zoneCollection.find((zone) => zone.id === zoneId);
+      zone.origin = CoordsMethods.sumCoords(zone.origin, coords);
+      zone.destination = CoordsMethods.sumCoords(zone.destination, coords);
       return zoneCollection;
     });
     render();
